@@ -1,39 +1,135 @@
-input.onButtonPressed(Button.A, function () {
-    comment.comment("DON'T CHANGE THIS CODE!")
-    radio.sendValue("A", 1)
+joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P14, joystickbit.ButtonType.down, function () {
+    basic.showLeds(`
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        # # # # #
+        `)
+    if (arrow == 3) {
+        basic.showIcon(IconNames.Yes)
+        points += 1
+    } else {
+        basic.showIcon(IconNames.No)
+        lives += -1
+    }
 })
-input.onButtonPressed(Button.AB, function () {
-    comment.comment("DON'T CHANGE THIS CODE!")
-    radio.sendValue("AB", 1)
+joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P15, joystickbit.ButtonType.down, function () {
+    basic.showLeds(`
+        . . . . #
+        . . . . #
+        . . . . #
+        . . . . #
+        . . . . #
+        `)
+    if (arrow == 1) {
+        basic.showIcon(IconNames.Yes)
+        points += 1
+    } else {
+        basic.showIcon(IconNames.No)
+        lives += -1
+    }
 })
-input.onButtonPressed(Button.B, function () {
-    comment.comment("DON'T CHANGE THIS CODE!")
-    radio.sendValue("B", 1)
+function arrow_speed () {
+    if (points >= 10 && points == 19) {
+        basic.pause(2000)
+    } else if (points >= 20 && points == 29) {
+        basic.pause(1000)
+    } else if (points >= 30) {
+        basic.pause(500)
+    } else {
+        basic.pause(2000)
+        basic.pause(1000)
+    }
+}
+joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P13, joystickbit.ButtonType.down, function () {
+    basic.showLeds(`
+        # # # # #
+        . . . . .
+        . . . . .
+        . . . . .
+        . . . . .
+        `)
+    if (arrow == 4) {
+        basic.showIcon(IconNames.Yes)
+        points += 1
+    } else {
+        basic.showIcon(IconNames.No)
+        lives += -1
+    }
 })
-let y = 0
-let x = 0
+joystickbit.onButtonEvent(joystickbit.JoystickBitPin.P12, joystickbit.ButtonType.down, function () {
+    basic.showLeds(`
+        # . . . .
+        # . . . .
+        # . . . .
+        # . . . .
+        # . . . .
+        `)
+    if (arrow == 2) {
+        basic.showIcon(IconNames.Yes)
+        points += 1
+    } else {
+        basic.showIcon(IconNames.No)
+        lives += -1
+    }
+})
+let stop = 0
+let select = 0
+let points = 0
+let arrow = 0
 joystickbit.initJoystickBit()
-comment.comment("CHANGE THE RADIO GROUP TO YOUR TEAM'S JOYSTICK NUMBER!")
-comment.comment("DO NOT CHANGE ANYTHING ELSE IN THIS CODE")
-radio.setGroup(27)
-basic.showIcon(IconNames.Yes)
-basic.showString("T")
+let radio2 = 1
+let lives = 3
 basic.forever(function () {
-    comment.comment("DON'T CHANGE THIS CODE!")
-    x = Math.map(joystickbit.getRockerValue(joystickbit.rockerType.X), 1023, 0, -100, 100)
-    y = Math.map(joystickbit.getRockerValue(joystickbit.rockerType.Y), 1023, 0, 100, -100)
-    radio.sendValue("x", x)
-    radio.sendValue("y", y)
-    if (joystickbit.getButton(joystickbit.JoystickBitPin.P12)) {
-        radio.sendValue("C", 1)
+    if (radio2 >= 27) {
+        radio2 = 1
+    } else {
+        radio.setGroup(radio2)
+        select = randint(1, 7)
+        if (select == 1) {
+            radio.sendValue("A", 1)
+        } else if (select == 2) {
+            radio.sendValue("B", 1)
+        } else if (select == 3) {
+            radio.sendValue("AB", 1)
+        } else if (select == 4) {
+            radio.sendValue("C", 1)
+        } else if (select == 5) {
+            radio.sendValue("D", 1)
+        } else if (select == 6) {
+            radio.sendValue("E", 1)
+        } else {
+            radio.sendValue("F", 1)
+        }
+        radio2 += 2
     }
-    if (joystickbit.getButton(joystickbit.JoystickBitPin.P13)) {
-        radio.sendValue("D", 1)
+})
+basic.forever(function () {
+    if (stop == 0) {
+        arrow = randint(1, 4)
+        if (arrow == 1) {
+            basic.showArrow(ArrowNames.East)
+            arrow_speed()
+        } else if (arrow == 2) {
+            basic.showArrow(ArrowNames.West)
+            arrow_speed()
+        } else if (arrow == 3) {
+            basic.showArrow(ArrowNames.South)
+            arrow_speed()
+        } else {
+            basic.showArrow(ArrowNames.North)
+            arrow_speed()
+        }
     }
-    if (joystickbit.getButton(joystickbit.JoystickBitPin.P14)) {
-        radio.sendValue("E", 1)
-    }
-    if (joystickbit.getButton(joystickbit.JoystickBitPin.P15)) {
-        radio.sendValue("F", 1)
+})
+basic.forever(function () {
+    if (lives == 0) {
+        stop = 1
+        basic.showString("game over")
+        basic.showString("score:" + points)
+        points = 0
+        stop = 0
+        lives = 3
     }
 })
